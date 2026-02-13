@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Sala Do Futuro Aluno</title>
+  <link rel="icon" href="favicon.png" type="image/png">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #111;
+      color: #eee;
+      overflow: hidden;
+    }
+    #conteudo {
+      display: none;
+      margin-top: 50px;
+      font-size: 1.5em;
+      color: #0f0;
+    }
+    #teclas {
+      margin-top: 30px;
+      font-size: 2em;
+      color: #0ff;
+    }
+    .tecla {
+      display: inline-block;
+      margin: 5px;
+      padding: 10px;
+      background: #333;
+      border-radius: 8px;
+      opacity: 1;
+      transition: opacity 1s ease-out;
+    }
+    .fade {
+      opacity: 0;
+    }
+    /* Estilo das notas de pontuação */
+    .nota {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 2em;
+      font-weight: bold;
+      opacity: 0;
+      animation: popUp 1s ease-out forwards;
+    }
+    @keyframes popUp {
+      0% { opacity: 0; transform: translate(-50%, 20px) scale(0.5); }
+      50% { opacity: 1; transform: translate(-50%, -20px) scale(1.2); }
+      100% { opacity: 0; transform: translate(-50%, -60px) scale(1); }
+    }
+    .perfect { color: #0f0; }
+    .great { color: #ff0; }
+  </style>
+</head>
+<body>
+  <h1>Digite o Konami Code para acessar</h1>
+  <p>=D</p>
+
+  <div id="teclas"></div>
+
+  <div id="conteudo">
+    ("🎉 Parabéns! Você desbloqueou o conteúdo secreto! 🎉")
+    <img src="topsecret.png" alt="Conteúdo Secreto" style="margin-top: 20px; width: 700px;">
+  </div>
+
+  <script>
+    const konamiCode = [
+      "ArrowUp", "ArrowUp",
+      "ArrowDown", "ArrowDown",
+      "ArrowLeft", "ArrowRight",
+      "ArrowLeft", "ArrowRight",
+      "b", "a"
+    ];
+
+    let pos = 0;
+    const teclasDiv = document.getElementById("teclas");
+    let ultimoTempo = Date.now();
+
+    const icones = {
+      "arrowup": "⬆️",
+      "arrowdown": "⬇️",
+      "arrowleft": "⬅️",
+      "arrowright": "➡️",
+      "b": "🅱️",
+      "a": "🅰️"
+    };
+
+    function mostrarNota(tipo) {
+      const nota = document.createElement("div");
+      nota.className = "nota " + tipo.toLowerCase();
+      nota.textContent = tipo;
+      document.body.appendChild(nota);
+      setTimeout(() => nota.remove(), 1000);
+    }
+
+    document.addEventListener("keydown", function(e) {
+      const tecla = e.key.toLowerCase();
+      const esperado = konamiCode[pos].toLowerCase();
+
+      const span = document.createElement("span");
+      span.className = "tecla";
+      span.textContent = icones[tecla] || tecla;
+      teclasDiv.appendChild(span);
+
+      setTimeout(() => {
+        span.classList.add("fade");
+        setTimeout(() => span.remove(), 1000);
+      }, 5000);
+
+      if (tecla === esperado) {
+        const agora = Date.now();
+        const delta = agora - ultimoTempo;
+        ultimoTempo = agora;
+
+        // Feedback estilo FNF
+        if (delta < 400) {
+          mostrarNota("Perfect!");
+        } else if (delta < 1000) {
+          mostrarNota("Great!");
+        }
+
+        pos++;
+        if (pos === konamiCode.length) {
+          document.getElementById("conteudo").style.display = "block";
+          alert("Konami Code ativado!");
+          pos = 0;
+          teclasDiv.innerHTML = "";
+        }
+      } else {
+        const teclas = document.querySelectorAll(".tecla");
+        teclas.forEach(t => {
+          t.classList.add("fade");
+          setTimeout(() => t.remove(), 1000);
+        });
+        pos = 0;
+      }
+    });
+  </script>
+</body>
+</html>
